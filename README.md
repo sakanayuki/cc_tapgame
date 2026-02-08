@@ -44,13 +44,13 @@ npm run preview
 
 ### 自動デプロイ (GitHub Actions)
 
-`main` ブランチへの push で自動的にデプロイされます。
+`main` ブランチまたは `claude/**` ブランチへの push で自動的にデプロイされます。
 
 #### 初回セットアップ手順
 
 1. GitHub リポジトリの **Settings > Pages** を開く
 2. **Source** を **GitHub Actions** に変更する
-3. `main` ブランチにマージまたは push する
+3. 対象ブランチに push する
 
 ワークフロー (`.github/workflows/deploy.yml`) がテスト → ビルド → デプロイを自動実行します。
 
