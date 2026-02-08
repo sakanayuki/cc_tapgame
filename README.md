@@ -1,73 +1,95 @@
-# React + TypeScript + Vite
+# PAW CHASE - タップレースゲーム
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+3D タップ操作のレースゲーム。パトカーを操作して逃走車を追いかけ、交差点で正しい方向を選んでスコアを稼ごう。
 
-Currently, two official plugins are available:
+- React 19 + Three.js + TypeScript
+- Vite でビルド / Vitest でテスト
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 必要環境
 
-## React Compiler
+- Node.js 22 以上
+- npm 10 以上
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## セットアップ
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone https://github.com/sakanayuki/cc_tapgame.git
+cd cc_tapgame
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 開発
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+# 開発サーバー起動 (http://localhost:5173)
+npm run dev
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# テスト実行
+npm test
+
+# テスト (ウォッチモード)
+npm run test:watch
+
+# カバレッジ付きテスト
+npm run test:coverage
+
+# 本番ビルド (dist/ に出力)
+npm run build
+
+# ビルド結果をプレビュー
+npm run preview
 ```
+
+## GitHub Pages デプロイ
+
+### 自動デプロイ (GitHub Actions)
+
+`main` ブランチへの push で自動的にデプロイされます。
+
+#### 初回セットアップ手順
+
+1. GitHub リポジトリの **Settings > Pages** を開く
+2. **Source** を **GitHub Actions** に変更する
+3. `main` ブランチにマージまたは push する
+
+ワークフロー (`.github/workflows/deploy.yml`) がテスト → ビルド → デプロイを自動実行します。
+
+デプロイ後の URL: `https://sakanayuki.github.io/cc_tapgame/`
+
+### 手動デプロイ
+
+GitHub Actions の **Actions** タブから `Deploy to GitHub Pages` ワークフローを選び、**Run workflow** で手動実行も可能です。
+
+### ローカルでビルドして確認
+
+```bash
+npm run build
+npm run preview
+```
+
+`dist/` ディレクトリに静的ファイルが生成されます。`vite.config.ts` の `base: '/cc_tapgame/'` により、GitHub Pages のサブパスに対応済みです。
+
+## プロジェクト構成
+
+```
+src/
+├── config/       # ゲーム設定定数
+├── core/         # GameManager, ScoreManager, TimerManager
+├── input/        # タッチ・キーボード入力
+├── judge/        # 交差点判定ロジック
+├── logger/       # 統一ログ出力
+├── map/          # マップデータ・道路・交差点グラフ
+├── vehicles/     # プレイヤー車両・NPC車両
+├── camera/       # 3人称カメラ制御
+├── ui/           # HUD・エフェクト
+├── scenes/       # タイトル・ゲームオーバー画面
+└── types/        # 型定義
+docs/
+├── requirements.md       # 要件定義書
+├── detailed-design.md    # 詳細設計書
+└── test-specification.md # テスト仕様書
+```
+
+## ライセンス
+
+Private
