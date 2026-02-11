@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { NpcBuggy } from './NpcBuggy.ts';
+import { Road } from '../map/Road.ts';
 
 describe('NpcBuggy', () => {
   let npc: NpcBuggy;
@@ -56,6 +57,40 @@ describe('NpcBuggy', () => {
     it('NB-031: 方向決定後', () => {
       npc.decideDirection(['left', 'right']);
       expect(npc.getChosenDirection()).not.toBeNull();
+    });
+  });
+
+  describe('enterRoad() — 双方向走行', () => {
+    it('NB-040: 順方向に進入', () => {
+      const road = new Road('ROAD_02', 'INT_03', 'INT_05', [
+        { x: 0, y: 0, z: 0 },
+        { x: 50, y: 0, z: 0 },
+      ]);
+      npc.enterRoad(road, 'INT_05');
+      expect(npc.getCurrentRoadId()).toBe('ROAD_02');
+      expect(npc.getCurrentProgress()).toBe(0);
+      expect(npc.getProgressDirection()).toBe(1);
+    });
+
+    it('NB-041: 逆方向に進入', () => {
+      const road = new Road('ROAD_02', 'INT_03', 'INT_05', [
+        { x: 0, y: 0, z: 0 },
+        { x: 50, y: 0, z: 0 },
+      ]);
+      npc.enterRoad(road, 'INT_03');
+      expect(npc.getCurrentRoadId()).toBe('ROAD_02');
+      expect(npc.getCurrentProgress()).toBe(1);
+      expect(npc.getProgressDirection()).toBe(-1);
+    });
+
+    it('NB-042: 逆方向走行の到達判定', () => {
+      const road = new Road('ROAD_02', 'INT_03', 'INT_05', [
+        { x: 0, y: 0, z: 0 },
+        { x: 50, y: 0, z: 0 },
+      ]);
+      npc.enterRoad(road, 'INT_03');
+      npc.update(10, road);
+      expect(npc.hasReachedIntersection()).toBe(true);
     });
   });
 });

@@ -16,21 +16,17 @@ export class InputHandler {
   private isEnabled: boolean = true;
   private lastInput: PlayerInput | null = null;
   private onDirectionInput: ((input: PlayerInput) => void) | null = null;
-  private container: HTMLElement | null = null;
-  private boundHandleTouch: (e: TouchEvent) => void;
-  private boundHandleClick: (e: MouseEvent) => void;
+  private boundHandlePointer: (e: PointerEvent) => void;
   private boundHandleKey: (e: KeyboardEvent) => void;
 
   constructor() {
-    this.boundHandleTouch = this.handleTouch.bind(this);
-    this.boundHandleClick = this.handleClick.bind(this);
+    this.boundHandlePointer = this.handlePointer.bind(this);
     this.boundHandleKey = this.handleKey.bind(this);
   }
 
-  initialize(container: HTMLElement): void {
-    this.container = container;
-    container.addEventListener('touchstart', this.boundHandleTouch, { passive: true });
-    container.addEventListener('click', this.boundHandleClick);
+  initialize(_container: HTMLElement): void {
+    // タッチ・マウスを統一的に処理する pointerdown をドキュメント全体に登録
+    document.addEventListener('pointerdown', this.boundHandlePointer);
     document.addEventListener('keydown', this.boundHandleKey);
   }
 
@@ -70,12 +66,8 @@ export class InputHandler {
   }
 
   dispose(): void {
-    if (this.container) {
-      this.container.removeEventListener('touchstart', this.boundHandleTouch);
-      this.container.removeEventListener('click', this.boundHandleClick);
-    }
+    document.removeEventListener('pointerdown', this.boundHandlePointer);
     document.removeEventListener('keydown', this.boundHandleKey);
-    this.container = null;
   }
 
   private processInput(direction: Direction): void {
@@ -89,17 +81,11 @@ export class InputHandler {
     this.onDirectionInput?.(input);
   }
 
-  private handleTouch(e: TouchEvent): void {
-    if (!this.isEnabled || !this.container) return;
-    const touch = e.touches[0];
-    if (!touch) return;
-    const direction = this.resolveTouchDirection(touch.clientX, this.container.clientWidth);
-    this.processInput(direction);
-  }
-
-  private handleClick(e: MouseEvent): void {
-    if (!this.isEnabled || !this.container) return;
-    const direction = this.resolveTouchDirection(e.clientX, this.container.clientWidth);
+  private handlePointer(e: PointerEvent): void {
+    if (!this.isEnabled) return;
+    const screenWidth = window.innerWidth;
+    if (screenWidth <= 0) return;
+    const direction = this.resolveTouchDirection(e.clientX, screenWidth);
     this.processInput(direction);
   }
 

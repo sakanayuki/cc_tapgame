@@ -106,11 +106,50 @@ describe('PlayerCar', () => {
   });
 
   describe('enterRoad()', () => {
-    it('PC-030: 新しい道路に進入', () => {
-      car.enterRoad('ROAD_02', 'INT_05');
+    it('PC-030: 順方向に進入 (target=endIntersection)', () => {
+      const road2 = new Road('ROAD_02', 'INT_03', 'INT_05', [
+        { x: 0, y: 0, z: 0 },
+        { x: 50, y: 0, z: 0 },
+      ]);
+      car.enterRoad(road2, 'INT_05');
       expect(car.getCurrentRoadId()).toBe('ROAD_02');
       expect(car.getCurrentProgress()).toBe(0);
+      expect(car.getProgressDirection()).toBe(1);
       expect(car.getTargetIntersectionId()).toBe('INT_05');
+    });
+
+    it('PC-031: 逆方向に進入 (target=startIntersection)', () => {
+      const road2 = new Road('ROAD_02', 'INT_03', 'INT_05', [
+        { x: 0, y: 0, z: 0 },
+        { x: 50, y: 0, z: 0 },
+      ]);
+      car.enterRoad(road2, 'INT_03');
+      expect(car.getCurrentRoadId()).toBe('ROAD_02');
+      expect(car.getCurrentProgress()).toBe(1);
+      expect(car.getProgressDirection()).toBe(-1);
+      expect(car.getTargetIntersectionId()).toBe('INT_03');
+    });
+
+    it('PC-032: 逆方向走行時に progress が減少する', () => {
+      const road2 = new Road('ROAD_02', 'INT_03', 'INT_05', [
+        { x: 0, y: 0, z: 0 },
+        { x: 50, y: 0, z: 0 },
+      ]);
+      car.enterRoad(road2, 'INT_03');
+      car.update(0.5, road2);
+      expect(car.getCurrentProgress()).toBeLessThan(1.0);
+    });
+
+    it('PC-033: 逆方向の到達判定', () => {
+      const road2 = new Road('ROAD_02', 'INT_03', 'INT_05', [
+        { x: 0, y: 0, z: 0 },
+        { x: 50, y: 0, z: 0 },
+      ]);
+      car.enterRoad(road2, 'INT_03');
+      // 十分な時間を進めて到達させる
+      car.update(10, road2);
+      expect(car.hasReachedIntersection()).toBe(true);
+      expect(car.getCurrentProgress()).toBe(0);
     });
   });
 });

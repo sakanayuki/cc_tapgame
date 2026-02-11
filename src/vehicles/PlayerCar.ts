@@ -7,6 +7,7 @@ export class PlayerCar {
   private rotation: number = 0;
   private currentRoadId: string = '';
   private currentProgress: number = 0;
+  private progressDirection: 1 | -1 = 1;
   private targetIntersectionId: string = '';
   private isSpinning: boolean = false;
   private spinElapsed: number = 0;
@@ -16,6 +17,7 @@ export class PlayerCar {
     this.currentRoadId = startRoadId;
     this.currentProgress = startProgress;
     this.targetIntersectionId = startIntersectionId;
+    this.progressDirection = 1;
     this.isSpinning = false;
     this.spinElapsed = 0;
     this.zRotation = 0;
@@ -35,12 +37,19 @@ export class PlayerCar {
     }
 
     const speedPerSec = GAME_CONFIG.VEHICLE_SPEED / road.length;
-    this.currentProgress += speedPerSec * deltaTime;
-    this.currentProgress = Math.min(this.currentProgress, 1.0);
+    this.currentProgress += this.progressDirection * speedPerSec * deltaTime;
+
+    if (this.progressDirection > 0) {
+      this.currentProgress = Math.min(this.currentProgress, 1.0);
+    } else {
+      this.currentProgress = Math.max(this.currentProgress, 0.0);
+    }
 
     this.position = road.getPositionAtProgress(this.currentProgress);
     const dir = road.getDirectionAtProgress(this.currentProgress);
-    this.rotation = Math.atan2(dir.x, dir.z);
+    // 逆走時は方向ベクトルを反転
+    const sign = this.progressDirection;
+    this.rotation = Math.atan2(dir.x * sign, dir.z * sign);
   }
 
   startSpin(): void {
@@ -61,6 +70,10 @@ export class PlayerCar {
     return this.currentProgress;
   }
 
+  getProgressDirection(): 1 | -1 {
+    return this.progressDirection;
+  }
+
   getTargetIntersectionId(): string {
     return this.targetIntersectionId;
   }
@@ -77,13 +90,25 @@ export class PlayerCar {
     return this.zRotation;
   }
 
-  enterRoad(roadId: string, targetIntersectionId: string): void {
-    this.currentRoadId = roadId;
-    this.currentProgress = 0;
+  enterRoad(road: Road, targetIntersectionId: string): void {
+    this.currentRoadId = road.id;
     this.targetIntersectionId = targetIntersectionId;
+
+    if (targetIntersectionId === road.endIntersectionId) {
+      // 順方向: start → end
+      this.currentProgress = 0;
+      this.progressDirection = 1;
+    } else {
+      // 逆方向: end → start
+      this.currentProgress = 1;
+      this.progressDirection = -1;
+    }
   }
 
   hasReachedIntersection(): boolean {
-    return this.currentProgress >= 1.0;
+    if (this.progressDirection > 0) {
+      return this.currentProgress >= 1.0;
+    }
+    return this.currentProgress <= 0.0;
   }
 }

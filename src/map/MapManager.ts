@@ -60,11 +60,17 @@ export class MapManager {
   getDistanceToIntersection(
     roadId: string,
     positionOnRoad: number,
-    _targetIntersectionId: string,
+    targetIntersectionId: string,
   ): number {
     const road = this.roads.get(roadId);
     if (!road) return Infinity;
-    return (1 - Math.max(0, Math.min(1, positionOnRoad))) * road.length;
+    const p = Math.max(0, Math.min(1, positionOnRoad));
+    // 順方向 (target=end): 残り = (1 - p) * length
+    // 逆方向 (target=start): 残り = p * length
+    if (targetIntersectionId === road.endIntersectionId) {
+      return (1 - p) * road.length;
+    }
+    return p * road.length;
   }
 
   private buildRoads(): void {

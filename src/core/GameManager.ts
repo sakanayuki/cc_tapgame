@@ -260,7 +260,8 @@ export class GameManager {
     const chosenDir = this.npcBuggy.decideDirection(dirs);
     const route = node.getRoute(this.npcBuggy.getCurrentRoadId(), chosenDir);
     if (route) {
-      this.npcBuggy.enterRoad(route.roadId, route.nextIntersectionId);
+      const road = this.mapManager.getRoad(route.roadId);
+      if (road) this.npcBuggy.enterRoad(road, route.nextIntersectionId);
     }
   }
 
@@ -301,7 +302,8 @@ export class GameManager {
     if (!node) return;
     const route = node.getRoute(this.playerCar.getCurrentRoadId(), correctDirection);
     if (route) {
-      this.playerCar.enterRoad(route.roadId, route.nextIntersectionId);
+      const road = this.mapManager.getRoad(route.roadId);
+      if (road) this.playerCar.enterRoad(road, route.nextIntersectionId);
     }
   }
 
@@ -312,7 +314,8 @@ export class GameManager {
     const dir: Direction = dirs.includes('straight') ? 'straight' : dirs[0];
     const route: RouteOption | undefined = node.getRoute(this.playerCar.getCurrentRoadId(), dir);
     if (route) {
-      this.playerCar.enterRoad(route.roadId, route.nextIntersectionId);
+      const road = this.mapManager.getRoad(route.roadId);
+      if (road) this.playerCar.enterRoad(road, route.nextIntersectionId);
     }
     this.inputHandler.clearLastInput();
     this.intersectionJudge.resetState();
