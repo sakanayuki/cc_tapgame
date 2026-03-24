@@ -425,7 +425,7 @@ export class GameManager {
       const roadMat = new THREE.MeshLambertMaterial({ color: 0x616161 });
       const roadMesh = new THREE.Mesh(roadGeo, roadMat);
       roadMesh.rotation.x = -Math.PI / 2;
-      roadMesh.rotation.z = -angle;
+      roadMesh.rotation.z = angle;
       roadMesh.position.set(
         (start.x + end.x) / 2,
         0,
